@@ -31,7 +31,27 @@ namespace Project.Scripts.Managers
 
         public void ChangeTurn()
         {
+            switch (currentTurn)
+            {
+                case Turn_Order.INTRO:
+                    StartCoroutine(RunIntro());
+                    break;
+                case Turn_Order.PLAYER_TURN:
+                    StartCoroutine(PlayerTurn());
+                    break;
+                case Turn_Order.ENEMY_TURN:
+                    StartCoroutine(EnemiesTurn());
+                    break;
+                case Turn_Order.END:
+                    StartCoroutine(EndLevel());
+                    break;
+                case Turn_Order.OTHER:
+                    StartCoroutine(DoOtherState());
+                    break;
+                default:
 
+                    break;
+            }
         }
 
         private IEnumerator RunIntro()
