@@ -1,3 +1,4 @@
+using Project.Scripts.Managers;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -11,11 +12,12 @@ namespace Project.Scripts.Player
         {
             IDLE,
             DO_TURN,
+            FINISH_TURN,
             DEFEND,
             END
         }
 
-        [SerializeField] private PlayerTurnState currentState;
+        public PlayerTurnState currentState;
 
         [SerializeField] private int playerHealth;
         [SerializeField] private int playerStamina;
@@ -30,10 +32,15 @@ namespace Project.Scripts.Player
         [SerializeField] private float currentDefenseCooldownTimer;
         [SerializeField] private bool canDefend = false;
 
+        [SerializeField] private int maxHealth;
+        [SerializeField] private int currentHealth;
+
         private bool fingerDown = false;
-        private bool m_playerIsAlive = true;
+        public bool m_playerIsAlive = true;
 
         private Vector2 initialPosition;
+
+        private TurnManager turnManager;
 
         public void InitializePlayerTurn()
         {
@@ -47,6 +54,7 @@ namespace Project.Scripts.Player
                 CheckPlayerInput();
             }
         }
+
 
         private void CheckPlayerInput()
         {
@@ -98,7 +106,39 @@ namespace Project.Scripts.Player
             }
         }
 
+        /// <summary>
+        /// Add / subtract from the current amount of health the player has.
+        /// </summary>
+        /// <param name="_amount">positive = heal, negative = damage</param>
+        public void ChangeCurrentHealth(int _amount)
+        {
+            currentHealth += _amount;
+            if (currentHealth <= 0) OnPlayerDeath();
+        }
 
+        /// <summary>
+        /// Tell manager that the player has died.
+        /// </summary>
+        private void OnPlayerDeath()
+        {
+            turnManager.SetPlayerDead(true);
+        }
+
+
+        /// <summary>
+        /// Add / subtract from the MAX health of the player. (for upgrade purposes)
+        /// </summary>
+        /// <param name="_amount">Amount to add or subtract from max health stat</param>
+        public void ChangeMaxHealth(int _amount)
+        {
+            maxHealth += _amount;
+        }
+
+        /// <summary>
+        /// Set the position of the defending object
+        /// </summary>
+        /// <param name="_horizontal">Is the player swiping horizontally?</param>
+        /// <param name="_offset">Distance from the player</param>
         private void SetDefenseObject(bool _horizontal, float _offset)
         {
             fingerDown = false;
